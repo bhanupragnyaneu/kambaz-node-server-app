@@ -1,7 +1,11 @@
 import { v4 as uuidv4 } from "uuid";
 export default function UsersDao(db) {
  let { users } = db;
-const createUser = (user) => (users = [...users, { ...user, _id: uuidv4() }]);
+  const createUser = (user) => {
+   const newUser = { ...user, _id: uuidv4() };
+   users = [...users, newUser];
+   return newUser;
+ };
 const findUserByUsername = (username) => users.find((user) => user.username === username);
  const findAllUsers = () => users;
  const findUserById = (userId) => users.find((user) => user._id === userId);
