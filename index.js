@@ -38,9 +38,9 @@ app.use(express.json());
 
 UserRoutes(app, db);
 
-CourseRoutes(app, db);
+CourseRoutes(app);
 
-ModulesRoutes(app, db);
+ModulesRoutes(app);
 
 AssignmentsRoutes(app, db);
 
