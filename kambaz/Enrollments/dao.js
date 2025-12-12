@@ -44,7 +44,7 @@ export default function EnrollmentsDao() {
     const userIds = courseEnrollments.map((enrollment) => enrollment.user);
     
     // Find all users that match those IDs
-    const users = await userModel.find({ user: { $in: userIds } });
+    const users = await userModel.find({ _id: { $in: userIds } });
     
     return users;
   }
