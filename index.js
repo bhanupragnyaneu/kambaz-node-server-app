@@ -42,7 +42,7 @@ CourseRoutes(app);
 
 ModulesRoutes(app);
 
-AssignmentsRoutes(app, db);
+AssignmentsRoutes(app);
 
 EnrollmentsRoutes(app, db);
 

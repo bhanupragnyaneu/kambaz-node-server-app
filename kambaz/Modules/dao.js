@@ -22,7 +22,7 @@ async function deleteModule(courseId, moduleId) {
    return status;
 }
 
-async function updateModule(moduleId, moduleUpdates) {
+async function updateModule(courseId, moduleId, moduleUpdates) {
   const course = await model.findById(courseId);
    const module = course.modules.id(moduleId);
    Object.assign(module, moduleUpdates);
@@ -34,7 +34,7 @@ async function updateModule(moduleId, moduleUpdates) {
 
    const course = await model.findById(courseId);
    console.log("Course found in DAO:", course);
-   return course.lessons;
+   return course.modules;
  }
  return {
    findModulesForCourse,
