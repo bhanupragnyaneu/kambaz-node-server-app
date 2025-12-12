@@ -53,16 +53,58 @@ export default function UserRoutes(app, db) {
     res.json(currentUser);
   };
 
+  // const signin = async (req, res) => {
+  //   const { username, password } = req.body;
+  //   const currentUser = await dao.findUserByCredentials(username, password);
+  //   if (currentUser) {
+  //     req.session["currentUser"] = currentUser;
+  //     console.log("User signed in, session set:", req.session["currentUser"]);
+  //     console.log("Session ID:", req.sessionID);
+  //     res.json(currentUser);
+  //   } else {
+  //     res.status(401).json({ message: "Unable to login. Try again later." });
+  //   }
+  // };
+
   const signin = async (req, res) => {
-    const { username, password } = req.body;
-    const currentUser = await dao.findUserByCredentials(username, password);
-    if (currentUser) {
-      req.session["currentUser"] = currentUser;
+  const { username, password } = req.body;
+  const currentUser = await dao.findUserByCredentials(username, password);
+  if (currentUser) {
+    req.session["currentUser"] = currentUser;
+    
+    // Save session explicitly and wait for it
+    req.session.save((err) => {
+      if (err) {
+        console.error("Session save error:", err);
+        return res.status(500).json({ message: "Session save failed" });
+      }
+      console.log(" SIGNIN - Session saved successfully");
+      console.log("Session ID:", req.sessionID);
+      console.log("Session data:", req.session);
+      console.log("Cookie header that will be sent:", res.getHeader('Set-Cookie'));
       res.json(currentUser);
-    } else {
-      res.status(401).json({ message: "Unable to login. Try again later." });
-    }
-  };
+    });
+  } else {
+    res.status(401).json({ message: "Unable to login. Try again later." });
+  }
+};
+
+const profile = (req, res) => {
+  console.log("=== PROFILE REQUEST ===");
+  console.log("Session ID:", req.sessionID);
+  console.log("Headers:", req.headers);
+  console.log("Cookies:", req.headers.cookie);
+  console.log("Session object:", req.session);
+  console.log("Current user:", req.session["currentUser"]);
+  console.log("======================");
+  
+  const currentUser = req.session["currentUser"];
+  if (!currentUser) {
+    res.sendStatus(401);
+    return;
+  }
+  res.json(currentUser);
+};
 
   const signout = (req, res) => {
     req.session.destroy();
@@ -70,14 +112,15 @@ export default function UserRoutes(app, db) {
     res.sendStatus(200);
   };
 
-  const profile = (req, res) => {
-    const currentUser = req.session["currentUser"];
-    if (!currentUser) {
-      res.sendStatus(401);
-      return;
-    }
-    res.json(currentUser);
-  };
+  // const profile = (req, res) => {
+  //   const currentUser = req.session["currentUser"];
+  //   console.log("Current user in session:", currentUser);
+  //   if (!currentUser) {
+  //     res.sendStatus(401);
+  //     return;
+  //   }
+  //   res.json(currentUser);
+  // };
     const createUser = async (req, res) => {
     const user = await dao.createUser(req.body);
     res.json(user);
@@ -85,17 +128,17 @@ export default function UserRoutes(app, db) {
 
 
 
-  app.post("/api/users", createUser);
-  app.delete("/api/users/:userId", deleteUser);
-  app.put("/api/users/:userId", updateUser);
+  // Specific routes must come BEFORE parameterized routes
+  app.post("/api/users/signup", signup);
+  app.post("/api/users/signin", signin);
+  app.post("/api/users/signout", signout);
+  app.post("/api/users/profile", profile);
+  
+  // Generic routes
   app.post("/api/users", createUser);
   app.get("/api/users", findAllUsers);
   app.get("/api/users/:userId", findUserById);
   app.put("/api/users/:userId", updateUser);
   app.delete("/api/users/:userId", deleteUser);
-  app.post("/api/users/signup", signup);
-  app.post("/api/users/signin", signin);
-  app.post("/api/users/signout", signout);
-  app.post("/api/users/profile", profile);
 }
 
